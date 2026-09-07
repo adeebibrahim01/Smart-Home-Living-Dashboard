@@ -1,4 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useIsRestoring,
+} from "@tanstack/react-query";
+
 import GlassCard from "../common/GlassCard";
 import Toggle from "../common/Toggle";
 import TemperatureGauge from "./TemperatureGauge";
@@ -34,6 +40,7 @@ const updateAC = async (active) => {
 
 function AirConditioner() {
   const queryClient = useQueryClient();
+  const isRestoring = useIsRestoring();
 
   const {
     data: acData,
@@ -42,8 +49,8 @@ function AirConditioner() {
   } = useQuery({
     queryKey: ["acState"],
     queryFn: fetchAC,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 
   const mutation = useMutation({
@@ -95,7 +102,12 @@ function AirConditioner() {
     },
   });
 
-  const active = acData?.active ?? true;
+  const hasACState =
+    typeof acData?.active === "boolean";
+
+  const active = hasACState
+    ? acData.active
+    : false;
 
   const handleToggle = (nextValue) => {
     const nextActive =
@@ -109,6 +121,12 @@ function AirConditioner() {
 
     mutation.mutate(nextActive);
   };
+
+  const isDisabled =
+    isRestoring ||
+    isLoading ||
+    mutation.isPending ||
+    !hasACState;
 
   return (
     <GlassCard className="h-full p-4 sm:p-5">
@@ -126,7 +144,7 @@ function AirConditioner() {
         <Toggle
           checked={active}
           onChange={handleToggle}
-          disabled={isLoading || mutation.isPending}
+          disabled={isDisabled}
           label="Air Conditioner"
         />
       </div>
