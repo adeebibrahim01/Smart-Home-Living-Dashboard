@@ -2,7 +2,7 @@ export default {
   async fetch(request, env, ctx) {
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, HEAD, PUT, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
       "Content-Type": "application/json",
     };
@@ -15,8 +15,12 @@ export default {
       });
     }
 
-    // Allow only GET and HEAD requests
-    if (request.method !== "GET" && request.method !== "HEAD") {
+    // Allow only GET, HEAD and PUT requests
+    if (
+      request.method !== "GET" &&
+      request.method !== "HEAD" &&
+      request.method !== "PUT"
+    ) {
       return new Response(
         JSON.stringify({ error: "Method not allowed" }),
         {
@@ -27,6 +31,95 @@ export default {
     }
 
     try {
+      // =========================
+      // AIR CONDITIONER - GET
+      // =========================
+      if (
+        new URL(request.url).pathname === "/api/ac" &&
+        request.method === "GET"
+      ) {
+        const device = await env.smart_home_db
+          .prepare(
+            `SELECT device_key, name, room, is_on
+             FROM devices
+             WHERE device_key = ?`
+          )
+          .bind("living-room-ac")
+          .first();
+
+        if (!device) {
+          return new Response(
+            JSON.stringify({
+              error: "Air Conditioner not found",
+            }),
+            {
+              status: 404,
+              headers: corsHeaders,
+            }
+          );
+        }
+
+        return new Response(
+          JSON.stringify({
+            deviceKey: device.device_key,
+            name: device.name,
+            room: device.room,
+            active: Boolean(device.is_on),
+          }),
+          {
+            status: 200,
+            headers: corsHeaders,
+          }
+        );
+      }
+
+      // =========================
+      // AIR CONDITIONER - PUT
+      // =========================
+      if (
+        new URL(request.url).pathname === "/api/ac" &&
+        request.method === "PUT"
+      ) {
+        const body = await request.json();
+
+        if (typeof body.active !== "boolean") {
+          return new Response(
+            JSON.stringify({
+              error: "active must be a boolean",
+            }),
+            {
+              status: 400,
+              headers: corsHeaders,
+            }
+          );
+        }
+
+        await env.smart_home_db
+          .prepare(
+            `UPDATE devices
+             SET is_on = ?
+             WHERE device_key = ?`
+          )
+          .bind(
+            body.active ? 1 : 0,
+            "living-room-ac"
+          )
+          .run();
+
+        return new Response(
+          JSON.stringify({
+            deviceKey: "living-room-ac",
+            name: "Air Conditioner",
+            room: "living room",
+            active: body.active,
+          }),
+          {
+            status: 200,
+            headers: corsHeaders,
+          }
+        );
+      }
+
       const response = await fetch(
         "https://api.open-meteo.com/v1/forecast?latitude=33.60557&longitude=73.94814&current_weather=true"
       );

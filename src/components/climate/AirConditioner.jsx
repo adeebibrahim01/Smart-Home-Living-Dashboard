@@ -1,10 +1,114 @@
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import GlassCard from "../common/GlassCard";
 import Toggle from "../common/Toggle";
 import TemperatureGauge from "./TemperatureGauge";
 
+const AC_API_URL =
+  "https://smart-home-weather.adeebibrahim01.workers.dev/api/ac";
+
+const fetchAC = async () => {
+  const response = await fetch(AC_API_URL);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch AC state");
+  }
+
+  return response.json();
+};
+
+const updateAC = async (active) => {
+  const response = await fetch(AC_API_URL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ active }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update AC state");
+  }
+
+  return response.json();
+};
+
 function AirConditioner() {
-  const [active, setActive] = useState(true);
+  const queryClient = useQueryClient();
+
+  const {
+    data: acData,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["acState"],
+    queryFn: fetchAC,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+  });
+
+  const mutation = useMutation({
+    mutationFn: updateAC,
+
+    onMutate: async (nextActive) => {
+      await queryClient.cancelQueries({
+        queryKey: ["acState"],
+      });
+
+      const previousAC = queryClient.getQueryData(["acState"]);
+
+      queryClient.setQueryData(["acState"], (currentAC) => ({
+        ...(currentAC ?? {}),
+        active: nextActive,
+        deviceKey:
+          currentAC?.deviceKey ?? "living-room-ac",
+        name:
+          currentAC?.name ?? "Air Conditioner",
+        room:
+          currentAC?.room ?? "living room",
+      }));
+
+      return {
+        previousAC,
+      };
+    },
+
+    onError: (_error, _nextActive, context) => {
+      if (context?.previousAC) {
+        queryClient.setQueryData(
+          ["acState"],
+          context.previousAC
+        );
+      }
+    },
+
+    onSuccess: (updatedAC) => {
+      queryClient.setQueryData(
+        ["acState"],
+        updatedAC
+      );
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["acState"],
+      });
+    },
+  });
+
+  const active = acData?.active ?? true;
+
+  const handleToggle = (nextValue) => {
+    const nextActive =
+      typeof nextValue === "boolean"
+        ? nextValue
+        : nextValue?.target?.checked;
+
+    if (typeof nextActive !== "boolean") {
+      return;
+    }
+
+    mutation.mutate(nextActive);
+  };
 
   return (
     <GlassCard className="h-full p-4 sm:p-5">
@@ -21,7 +125,8 @@ function AirConditioner() {
 
         <Toggle
           checked={active}
-          onChange={setActive}
+          onChange={handleToggle}
+          disabled={isLoading || mutation.isPending}
           label="Air Conditioner"
         />
       </div>
@@ -35,6 +140,12 @@ function AirConditioner() {
       >
         <TemperatureGauge />
       </div>
+
+      {isError && (
+        <p className="mt-2 text-[9px] text-red-500">
+          Failed to load AC state
+        </p>
+      )}
     </GlassCard>
   );
 }

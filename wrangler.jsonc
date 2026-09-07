@@ -1,5 +1,12 @@
 {
-  "name": "smart-home-weather",
-  "main": "src/worker/index.js",
-  "compatibility_date": "2026-09-07"
+	"name": "smart-home-weather",
+	"main": "src/worker/index.js",
+	"compatibility_date": "2026-09-07",
+	"d1_databases": [
+		{
+			"binding": "smart_home_db",
+			"database_name": "smart-home-db",
+			"database_id": "6459be47-12cc-4466-b0e7-c3ffc0ff2edf"
+		}
+	]
 }
