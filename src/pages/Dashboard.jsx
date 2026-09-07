@@ -24,7 +24,7 @@ function Dashboard() {
   const { data: weather, isLoading, refetch } = useQuery({
   queryKey: ["weatherData"],
   queryFn: fetchWeather,
-  staleTime: 1000 * 60 * 5,
+  staleTime: 1000 * 60 * 1,
   gcTime: 1000 * 60 * 10,
   enabled: false,
 });
@@ -47,14 +47,24 @@ useEffect(() => {
             <HeroRoom />
           </div>
 
-          {/* RIGHT SIDE */}
-          <div className="flex min-w-0 h-full flex-col gap-3">
-            <WeatherCard
-              location={weather?.location ?? "Islamabad, PK"}
-              temperature={weather?.temperature ?? "30°"}
-              forecasts={weather?.forecasts ?? []}
-              isLoading={isLoading}
-            />
+{/* RIGHT SIDE */}
+<div className="flex min-w-0 h-full flex-col gap-3">
+  <WeatherCard
+    location={weather?.location ?? "Tatta Pani, AJK"}
+    temperature={weather?.temperature ?? "30°"}
+    forecasts={weather?.forecasts ?? []}
+    isLoading={isLoading}
+  />
+
+  <div className="min-h-0 flex-1">
+    <NowPlaying
+      title={music.title}
+      subtitle={music.subtitle}
+      duration={music.duration}
+      albumImage={music.albumImage}
+    />
+  </div>
+</div>
 
             <div className="min-h-0 flex-1">
               <NowPlaying

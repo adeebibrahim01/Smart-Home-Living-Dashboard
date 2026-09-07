@@ -1,5 +1,5 @@
 {
   "name": "smart-home-weather",
-  "main": "index.js",
+  "main": "src/worker/index.js",
   "compatibility_date": "2026-09-07"
 }
