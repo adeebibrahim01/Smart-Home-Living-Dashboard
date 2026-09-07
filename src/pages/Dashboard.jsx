@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import DashboardShell from "../components/layout/DashboardShell";
 import HeroRoom from "../components/hero/HeroRoom";
@@ -10,37 +10,25 @@ import PortfolioCard from "../components/portfolio/PortfolioCard";
 
 import { music } from "../data/music";
 
-function Dashboard() {
-  const [weather, setWeather] = useState(null);
-
- useEffect(() => {
-  let cancelled = false;
-
-  async function loadWeather() {
-    try {
-      const WORKER_URL = "https://smart-home-weather.adeebibrahim01.workers.dev";
-
-      const response = await fetch(WORKER_URL);
-      if (!response.ok) {
-        throw new Error(`Worker error: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!cancelled) {
-        setWeather(data);
-      }
-    } catch (error) {
-      console.error("Weather fetch failed:", error);
-    }
+// Fetcher Function
+const fetchWeather = async () => {
+  const WORKER_URL = "https://smart-home-weather.adeebibrahim01.workers.dev";
+  const response = await fetch(WORKER_URL);
+  if (!response.ok) {
+    throw new Error("Failed to fetch weather data");
   }
+  return response.json();
+};
 
-  loadWeather();
+function Dashboard() {
+  // TanStack Query Hook
+  const { data: weather, isLoading } = useQuery({
+    queryKey: ["weatherData"], // Unique Identifier
+    queryFn: fetchWeather,     // Fetcher Function
+    staleTime: 1000 * 60 * 5,  // 5 Minutes tak cached data rahega (no auto-refetch)
+    gcTime: 1000 * 60 * 10,     // 10 Minutes tak memory me save rakhega
+  });
 
-  return () => {
-    cancelled = true;
-  };
-}, []);
   return (
     <DashboardShell>
       <div className="grid w-full gap-3">
@@ -54,9 +42,10 @@ function Dashboard() {
           {/* RIGHT SIDE */}
           <div className="flex min-w-0 h-full flex-col gap-3">
             <WeatherCard
-              location={weather?.location ?? "Loading weather..."}
-              temperature={weather?.temperature ?? "--°"}
+              location={weather?.location ?? "Islamabad, PK"}
+              temperature={weather?.temperature ?? "30°"}
               forecasts={weather?.forecasts ?? []}
+              isLoading={isLoading}
             />
 
             <div className="min-h-0 flex-1">
@@ -74,16 +63,9 @@ function Dashboard() {
         <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-3">
           <AirConditioner />
 
-          <EnergyCard
-            usage={16.4}
-            unit="kWh"
-            period="Week"
-          />
+          <EnergyCard usage={16.4} unit="kWh" period="Week" />
 
-          <PortfolioCard
-            value={156}
-            label="Portfolio"
-          />
+          <PortfolioCard value={156} label="Portfolio" />
         </div>
       </div>
     </DashboardShell>
