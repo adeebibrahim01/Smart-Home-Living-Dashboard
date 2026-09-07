@@ -13,42 +13,34 @@ import { music } from "../data/music";
 function Dashboard() {
   const [weather, setWeather] = useState(null);
 
-  useEffect(() => {
-    let cancelled = false;
+ useEffect(() => {
+  let cancelled = false;
 
-    async function loadWeather() {
-      try {
-        // Direct OpenWeatherMap API hit karein (Ya mockup data)
-        const response = await fetch(
-          "https://api.open-meteo.com/v1/forecast?latitude=33.6844&longitude=73.0479&current_weather=true"
-        );
+  async function loadWeather() {
+    try {
+      const WORKER_URL = "https://smart-home-weather.adeebibrahim01.workers.dev";
 
-        if (!response.ok) {
-          throw new Error(`Weather request failed: ${response.status}`);
-        }
-
-        const rawData = await response.json();
-
-        if (!cancelled) {
-          // Format payload for WeatherCard component
-          setWeather({
-            location: "Islamabad / Rawalpindi",
-            temperature: `${Math.round(rawData.current_weather.temperature)}°C`,
-            forecasts: []
-          });
-        }
-      } catch (error) {
-        console.error("Weather API error:", error);
+      const response = await fetch(WORKER_URL);
+      if (!response.ok) {
+        throw new Error(`Worker error: ${response.status}`);
       }
+
+      const data = await response.json();
+
+      if (!cancelled) {
+        setWeather(data);
+      }
+    } catch (error) {
+      console.error("Weather fetch failed:", error);
     }
+  }
 
-    loadWeather();
+  loadWeather();
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
+  return () => {
+    cancelled = true;
+  };
+}, []);
   return (
     <DashboardShell>
       <div className="grid w-full gap-3">

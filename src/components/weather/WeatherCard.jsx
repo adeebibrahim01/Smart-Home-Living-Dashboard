@@ -1,12 +1,9 @@
+import React from "react";
 import GlassCard from "../common/GlassCard";
 import CurrentWeather from "./CurrentWeather";
 import ForecastGrid from "./ForecastGrid";
 
-function WeatherCard({
-  location = "Pendleton, Pendleton",
-  temperature = "+3°",
-  forecasts = [],
-}) {
+function WeatherCard({ location, temperature, forecasts }) {
   return (
     <GlassCard
       className="
@@ -22,11 +19,11 @@ function WeatherCard({
       "
     >
       <CurrentWeather
-        location={location}
-        temperature={temperature}
+        location={location || "Islamabad, PK"}
+        temperature={temperature || "--°"}
       />
 
-      <ForecastGrid forecasts={forecasts} />
+      <ForecastGrid forecasts={forecasts || []} />
     </GlassCard>
   );
 }
