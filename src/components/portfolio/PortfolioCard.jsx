@@ -32,21 +32,30 @@ function PortfolioCard({
         </span>
       </div>
 
-      <div className="mt-5 h-10 overflow-hidden rounded-t-[8px] bg-white/65">
+      {/* Chart */}
+      <div className="mt-24 h-[92px] overflow-hidden rounded-t-[8px] bg-white/65">
         <div className="flex h-full items-end gap-1">
-          {[35, 52, 44, 70, 61, 78, 65, 90].map(
-            (height, index) => (
-              <div
-                key={index}
-                className="flex-1 rounded-t-[5px] bg-[#eda00d]/[0.12]"
-                style={{ height: `${height}%` }}
-              />
-            )
+          {[50, 68, 58, 82, 72, 92, 78, 100].map(
+            (height, index) => {
+              const highlighted = [2, 5, 7].includes(index);
+
+              return (
+                <div
+                  key={index}
+                  className={`flex-1 rounded-t-[5px] ${
+                    highlighted
+                      ? "bg-[#eda00d]"
+                      : "bg-[#eda00d]/[0.12]"
+                  }`}
+                  style={{
+                    height: `${height}%`,
+                  }}
+                />
+              );
+            }
           )}
         </div>
       </div>
-
-      <div className="-mt-2 h-3 w-[45%] rounded-t-[5px] bg-[#eda00d]" />
     </GlassCard>
   );
 }
