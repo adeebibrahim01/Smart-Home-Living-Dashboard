@@ -15,26 +15,28 @@ function Dashboard() {
     <DashboardShell>
       <div className="grid w-full gap-3">
         {/* TOP SECTION */}
-        <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.68fr)_minmax(280px,0.92fr)]">
+        <div className="grid min-w-0 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.68fr)_minmax(280px,0.92fr)] lg:items-stretch">
           {/* LEFT SIDE */}
-          <div className="min-w-0">
+          <div className="min-w-0 h-full">
             <HeroRoom />
           </div>
 
           {/* RIGHT SIDE */}
-          <div className="grid min-w-0 content-start gap-3">
+          <div className="flex min-w-0 h-full flex-col gap-3">
             <WeatherCard
               location={weather.location}
               temperature={weather.temperature}
               forecasts={weather.forecasts}
             />
 
-            <NowPlaying
-              title={music.title}
-              subtitle={music.subtitle}
-              duration={music.duration}
-              albumImage={music.albumImage}
-            />
+            <div className="min-h-0 flex-1">
+              <NowPlaying
+                title={music.title}
+                subtitle={music.subtitle}
+                duration={music.duration}
+                albumImage={music.albumImage}
+              />
+            </div>
           </div>
         </div>
 

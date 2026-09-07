@@ -19,7 +19,7 @@ function NowPlaying({
   const [progress, setProgress] = useState(58);
 
   return (
-    <GlassCard className="p-4 sm:p-5">
+    <GlassCard className="min-h-[230px] h-full p-4 sm:p-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="flex h-7 w-7 items-center justify-center rounded-full border border-black/10">
@@ -55,7 +55,7 @@ function NowPlaying({
         </div>
       </div>
 
-      <div className="mt-5">
+      <div className="mt-6">
         <input
           type="range"
           min="0"
@@ -74,7 +74,7 @@ function NowPlaying({
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-center gap-6">
+      <div className="mt-5 flex items-center justify-center gap-6">
         <button
           type="button"
           aria-label="Previous"
