@@ -3,42 +3,41 @@ function TemperatureGauge({
   min = "20°",
   max = "35°",
 }) {
+  const totalTicks = 32;
+  const activeTicks = 10; // Highlighted amber ticks
+
+  // Angle calculations for the last active tick pointer arrow
+  const pointerAngle = 140 + ((activeTicks - 1) * 260) / (totalTicks - 1);
+  const pointerRad = (pointerAngle * Math.PI) / 180;
+  const arrowX = 100 + Math.cos(pointerRad) * 85;
+  const arrowY = 100 + Math.sin(pointerRad) * 85;
+
   return (
-    <div className="relative mx-auto h-[215px] w-[215px]">
-      <svg
-        viewBox="0 0 220 220"
-        className="h-full w-full"
-      >
-        {/* Base gauge */}
+    <div className="relative mx-auto h-[220px] w-[220px] select-none">
+      <svg viewBox="0 0 200 200" className="h-full w-full">
+        {/* Background Dashed Arc Outer Ring */}
         <path
-          d="M 35 150 A 82 82 0 1 1 185 150"
+          d="M 30 152 A 85 85 0 1 1 170 152"
           fill="none"
-          stroke="#dfe1df"
+          stroke="#e5e7eb"
           strokeWidth="1"
-          strokeDasharray="2 8"
-          strokeLinecap="round"
+          strokeDasharray="2 5"
         />
 
-        {/* Orange progress */}
-        <path
-          d="M 35 150 A 82 82 0 0 1 78 77"
-          fill="none"
-          stroke="#eda00d"
-          strokeWidth="2"
-          strokeDasharray="2 9"
-          strokeLinecap="round"
-        />
-
-        {/* Tick marks */}
-        {Array.from({ length: 25 }).map((_, index) => {
-          const angle = -140 + index * 10;
+        {/* Ticks Array */}
+        {Array.from({ length: totalTicks }).map((_, index) => {
+          // Arc angles from 140 deg to 400 deg (260 deg total arc)
+          const angle = 140 + (index * 260) / (totalTicks - 1);
           const radians = (angle * Math.PI) / 180;
 
-          const x1 = 110 + Math.cos(radians) * 88;
-          const y1 = 110 + Math.sin(radians) * 88;
+          const isActive = index < activeTicks;
+          const rInner = 74;
+          const rOuter = 82;
 
-          const x2 = 110 + Math.cos(radians) * 82;
-          const y2 = 110 + Math.sin(radians) * 82;
+          const x1 = 100 + Math.cos(radians) * rInner;
+          const y1 = 100 + Math.sin(radians) * rInner;
+          const x2 = 100 + Math.cos(radians) * rOuter;
+          const y2 = 100 + Math.sin(radians) * rOuter;
 
           return (
             <line
@@ -47,50 +46,60 @@ function TemperatureGauge({
               y1={y1}
               x2={x2}
               y2={y2}
-              stroke={index < 7 ? "#eda00d" : "#bfc1c0"}
-              strokeWidth="1"
+              stroke={isActive ? "#f59e0b" : "#d1d5db"}
+              strokeWidth={isActive ? "2" : "1.2"}
+              strokeLinecap="round"
             />
           );
         })}
+
+        {/* Pointer Arrow on Active Line */}
+        <g transform={`translate(${arrowX}, ${arrowY}) rotate(${pointerAngle + 90})`}>
+          <polygon points="0,0 -3.5,-6 3.5,-6" fill="#f59e0b" />
+        </g>
       </svg>
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center pt-5">
-        <span className="text-[9px] text-[#737373]">
+      {/* Center Details */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pb-3">
+        <span className="text-[11px] font-normal text-gray-500">
           Cooling to
         </span>
 
-        <span className="mt-1 text-[28px] font-medium tracking-[-0.05em]">
+        <span className="my-0.5 text-[32px] font-medium tracking-tight text-gray-900">
           {temperature}
         </span>
 
-        <span className="mt-1 text-[9px] text-[#737373]">
+        <span className="text-[10px] font-normal text-gray-400">
           Under 12 min
         </span>
       </div>
 
-      <span className="absolute bottom-3 left-3 text-[10px] text-[#686868]">
-        {min}
-      </span>
+      {/* Bottom Labels & Buttons (Image Exact Match) */}
+      <div className="absolute bottom-1 left-0 right-0 flex items-center justify-between px-2">
+        <span className="w-8 text-center text-[12px] font-normal text-gray-600">
+          {min}
+        </span>
 
-      <span className="absolute bottom-3 right-3 text-[10px] text-[#686868]">
-        {max}
-      </span>
+        <button
+          type="button"
+          aria-label="Decrease temperature"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-[14px] font-medium text-gray-600 shadow-sm transition-transform active:scale-95"
+        >
+          −
+        </button>
 
-      <button
-        type="button"
-        aria-label="Decrease temperature"
-        className="absolute bottom-1.5 left-1/2 flex h-6 w-6 -translate-x-1/2 items-center justify-center rounded-full bg-white text-[12px] shadow-sm"
-      >
-        −
-      </button>
+        <button
+          type="button"
+          aria-label="Increase temperature"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-[14px] font-medium text-gray-600 shadow-sm transition-transform active:scale-95"
+        >
+          +
+        </button>
 
-      <button
-        type="button"
-        aria-label="Increase temperature"
-        className="absolute bottom-1.5 right-1/2 flex h-6 w-6 translate-x-[62px] items-center justify-center rounded-full bg-white text-[12px] shadow-sm"
-      >
-        +
-      </button>
+        <span className="w-8 text-center text-[12px] font-normal text-gray-600">
+          {max}
+        </span>
+      </div>
     </div>
   );
 }

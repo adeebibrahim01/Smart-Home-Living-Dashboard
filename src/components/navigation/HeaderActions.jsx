@@ -43,11 +43,11 @@ function HeaderActions() {
 
         <div className="hidden leading-tight sm:block">
           <p className="text-[11px] font-medium text-[#151515]">
-            Daniel Mohiti
+           Adeeb Ibrhaim
           </p>
 
           <p className="mt-0.5 text-[9px] text-[#858585]">
-            Systems Manager
+           Frontend developer
           </p>
         </div>
       </div>

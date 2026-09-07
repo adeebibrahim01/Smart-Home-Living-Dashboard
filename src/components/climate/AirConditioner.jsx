@@ -30,7 +30,7 @@ function AirConditioner() {
         className={
           active
             ? "opacity-100 transition-opacity"
-            : "opacity-45 transition-opacity"
+            : "opacity-10 transition-opacity"
         }
       >
         <TemperatureGauge />
