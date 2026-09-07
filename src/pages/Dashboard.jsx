@@ -7,7 +7,7 @@ import NowPlaying from "../components/music/NowPlaying";
 import AirConditioner from "../components/climate/AirConditioner";
 import EnergyCard from "../components/energy/EnergyCard";
 import PortfolioCard from "../components/portfolio/PortfolioCard";
-
+import { useEffect } from "react";
 import { music } from "../data/music";
 
 // Fetcher Function
@@ -21,13 +21,21 @@ const fetchWeather = async () => {
 };
 
 function Dashboard() {
-  // TanStack Query Hook
-  const { data: weather, isLoading } = useQuery({
-    queryKey: ["weatherData"], // Unique Identifier
-    queryFn: fetchWeather,     // Fetcher Function
-    staleTime: 1000 * 60 * 5,  // 5 Minutes tak cached data rahega (no auto-refetch)
-    gcTime: 1000 * 60 * 10,     // 10 Minutes tak memory me save rakhega
+  const { data: weather, isLoading, refetch } = useQuery({
+  queryKey: ["weatherData"],
+  queryFn: fetchWeather,
+  staleTime: 1000 * 60 * 5,
+  gcTime: 1000 * 60 * 10,
+  enabled: false,
+});
+
+useEffect(() => {
+  const id = requestAnimationFrame(() => {
+    refetch();
   });
+
+  return () => cancelAnimationFrame(id);
+}, [refetch]);
 
   return (
     <DashboardShell>
