@@ -47,24 +47,14 @@ useEffect(() => {
             <HeroRoom />
           </div>
 
-{/* RIGHT SIDE */}
-<div className="flex min-w-0 h-full flex-col gap-3">
-  <WeatherCard
-    location={weather?.location ?? "Tatta Pani, AJK"}
-    temperature={weather?.temperature ?? "30°"}
-    forecasts={weather?.forecasts ?? []}
-    isLoading={isLoading}
-  />
-
-  <div className="min-h-0 flex-1">
-    <NowPlaying
-      title={music.title}
-      subtitle={music.subtitle}
-      duration={music.duration}
-      albumImage={music.albumImage}
-    />
-  </div>
-</div>
+          {/* RIGHT SIDE */}
+          <div className="flex min-w-0 h-full flex-col gap-3">
+            <WeatherCard
+              location={weather?.location ?? "Tatta Pani, AJK"}
+              temperature={weather?.temperature ?? ""}
+              forecasts={weather?.forecasts ?? []}
+              isLoading={isLoading}
+            />
 
             <div className="min-h-0 flex-1">
               <NowPlaying
