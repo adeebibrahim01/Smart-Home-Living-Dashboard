@@ -5,6 +5,12 @@ import GlassCard from "../common/GlassCard";
 const heroImage =
   "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1800&q=90";
 
+// Preload the hero image as early as possible.
+if (typeof window !== "undefined") {
+  const preloadImage = new Image();
+  preloadImage.src = heroImage;
+}
+
 function HeroRoom() {
   return (
     <GlassCard
@@ -15,11 +21,11 @@ function HeroRoom() {
         src={heroImage}
         alt="Bright modern living room"
         loading="eager"
-        decoding="async"
+        fetchPriority="high"
+        decoding="sync"
         className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.015]"
       />
 
-      {/* Screenshot has a soft warm/white washed appearance */}
       <div className="absolute inset-0 bg-white/10" />
 
       <div className="absolute inset-0 bg-gradient-to-r from-white/15 via-transparent to-white/10" />
@@ -34,5 +40,5 @@ function HeroRoom() {
     </GlassCard>
   );
 }
-//ok
+
 export default HeroRoom;

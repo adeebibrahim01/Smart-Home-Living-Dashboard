@@ -5,7 +5,7 @@ import {
   SkipBack,
   SkipForward,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import GlassCard from "../common/GlassCard";
 
@@ -17,6 +17,14 @@ function NowPlaying({
 }) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(58);
+
+  // Preload the static album image before it is displayed.
+  useEffect(() => {
+    if (!albumImage) return;
+
+    const preloadImage = new Image();
+    preloadImage.src = albumImage;
+  }, [albumImage]);
 
   return (
     <GlassCard className="min-h-[230px] h-full p-4 sm:p-5">
@@ -40,7 +48,9 @@ function NowPlaying({
         <img
           src={albumImage}
           alt=""
-          loading="lazy"
+          loading="eager"
+          fetchPriority="high"
+          decoding="sync"
           className="h-9 w-9 rounded-[8px] object-cover"
         />
 
