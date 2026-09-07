@@ -1,3 +1,5 @@
-name = "smart-home-weather-api"
-main = "worker/index.js"
+name = "smart-home-dashboard"
 compatibility_date = "2026-09-07"
+
+[assets]
+directory = "./dist"
